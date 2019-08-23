@@ -22,6 +22,7 @@
 
 			'\{ ([A-Za-z0-9_]+)\.([^}]*) \| ([^}]*) \}' => '<?php echo $this -> loadPipe($this -> props["$1"]["$2"], "$3"); ?>',
 			'\{ ([A-Za-z0-9_]+) \| ([^}]*) \}' => '<?php echo $this -> loadPipe($this -> props["$1"], "$2"); ?>',
+			'\{ \.([A-Za-z0-9_]+) \| ([^}]*) \}' => '<?php echo $this -> loadPipe($$1, "$2"); ?>',
 
 			'\{ ([A-Za-z0-9_]+) \}' => '<?php echo $this -> props["$1"]; ?>',
 			'\{ \.([A-Za-z0-9_]+) \}' => '<?php echo $$1; ?>',
