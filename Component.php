@@ -1,6 +1,6 @@
 <?php
 	class Component {
-		private $dir = 'modules/';
+		private $dir = '';
 		private $pipesDir = 'pipes/';
 		private $path;
 		private $dirName;
@@ -59,7 +59,6 @@
 
 			$content =  $this -> replace_tags($tpl, $this -> varTags);
 			$content = $this -> prerender($content, $this -> funcTags);
-			// echo $content; die();
 			echo $this -> prerender($content, $this -> specialTags);
 		}
 
