@@ -1,6 +1,6 @@
 <?php
 	class Component {
-		private $dir = 'modules/';
+		private $dir = '';
 		private $pipesDir = 'pipes/';
 		private $path;
 		private $dirName;
