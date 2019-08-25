@@ -59,7 +59,7 @@ You have to create **.tpl** file, the others is optional.
 - **{ else }** - else statement
 - **{ endif }** - ends if statement
 - **{ foreach $propArrayName as varName }** - starts foreach loop and define variable
-- **{ .varName }** - displays variable value defined in foreach loop
+- **{ this.varName }** - displays variable value defined in foreach loop
 - **{ endforeach }** - ends foreach loop
 - **{ component $propName }** or **{ component Namespace/To/Component }** - loads other component
 - **{ path string }** - returns path of the component and adds '/string' suffix
