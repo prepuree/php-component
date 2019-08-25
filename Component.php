@@ -12,7 +12,7 @@
 			'\{ foreach \$([A-Za-z0-9_]+).([A-Za-z0-9_]+) as ([A-Za-z0-9_]+) \}' => '<?php foreach($this -> props["$1"]["$2"] as $$3): ?>',
 			'\{ endforeach \}' => '<?php endforeach; ?>',
 
-			'\{ component ([A-Za-z0-9_]+) \}' => '<?php $_cp = new Component($this -> props["$1"]); $_cp -> render(); $this -> merge($_cp); ?>',
+			'\{ component $([A-Za-z0-9_]+) \}' => '<?php $_cp = new Component($this -> props["$1"]); $_cp -> render(); $this -> merge($_cp); ?>',
 			'\{ component ([^}]*) \}' => '<?php $_cp = new Component("$1"); $_cp -> render(); $this -> merge($_cp); ?>',
 			'\{ path ([^}]*) \}' => '<?php echo $this -> dir.$this -> path."/"."$1"; ?>',
 			'\{ function ([A-Za-z0-9_]+) \}' => '<?php echo $model -> $1(); ?>',
@@ -35,7 +35,7 @@
 			'\{ elseif ([^}]*) \}' => '<?php elseif($1): ?>',
 			'\{ else \}' => '<?php else: ?>',
 			'\{ endif \}' => '<?php endif; ?>',
-			
+
 			'\{% css %\}' => '<?php $this -> css(); ?>',
 			'\{% js %\}' => '<?php $this -> js(); ?>'
 		];
