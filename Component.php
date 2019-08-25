@@ -1,41 +1,37 @@
 <?php
 	class Component {
-		private $dir = '';
+		private $dir = 'modules/';
 		private $pipesDir = 'pipes/';
 		private $path;
 		private $dirName;
 		protected $props = [];
 		protected $css = [];
 		protected $js = [];
-		private $tags = [
-			'\{ foreach \$([A-Za-z0-9_]+) as ([A-Za-z0-9_]+) \}' => '<?php foreach($this -> props["$1"] as $$2): ?>',
-			'\{ foreach \$([A-Za-z0-9_]+).([A-Za-z0-9_]+) as ([A-Za-z0-9_]+) \}' => '<?php foreach($this -> props["$1"]["$2"] as $$3): ?>',
-			'\{ endforeach \}' => '<?php endforeach; ?>',
 
-			'\{ component $([A-Za-z0-9_]+) \}' => '<?php $_cp = new Component($this -> props["$1"]); $_cp -> render(); $this -> merge($_cp); ?>',
-			'\{ component ([^}]*) \}' => '<?php $_cp = new Component("$1"); $_cp -> render(); $this -> merge($_cp); ?>',
-			'\{ path ([^}]*) \}' => '<?php echo $this -> dir.$this -> path."/"."$1"; ?>',
-			'\{ function ([A-Za-z0-9_]+) \}' => '<?php echo $model -> $1(); ?>',
-
-			'\{ \$([A-Za-z0-9_]+)\.([^}]*) \| ([^}]*) \}' => '<?php echo $this -> loadPipe($this -> props["$1"]["$2"], "$3"); ?>',
-			'\{ \$([A-Za-z0-9_]+) \| ([^}]*) \}' => '<?php echo $this -> loadPipe($this -> props["$1"], "$2"); ?>',
-			'\{ \.([A-Za-z0-9_]+) \| ([^}]*) \}' => '<?php echo $this -> loadPipe($$1, "$2"); ?>',
-			
-			'\{ \$([A-Za-z0-9_]+)\.([^}]*) \}' => '<?php echo $this -> props["$1"]["$2"]; ?>',
-			'\{ \$([A-Za-z0-9_]+) \}' => '<?php echo $this -> props["$1"]; ?>',
-			'\{ \.([A-Za-z0-9_]+) \}' => '<?php echo $$1; ?>',
-
+		private $varTags = [
 			'\$([A-Za-z0-9_]+)\.([^}]*)' => '$this -> props["$1"]["$2"]',
 			'\$([A-Za-z0-9_]+)' => '$this -> props["$1"]',
-			'\.([A-Za-z0-9_]+)' => 'echo $$1',
+			'\.([A-Za-z0-9_]+)' => '$$1',
 		];
 
-		private $specialTags = [
+		private $funcTags = [
 			'\{ if ([^}]*) \}' => '<?php if($1): ?>',
 			'\{ elseif ([^}]*) \}' => '<?php elseif($1): ?>',
 			'\{ else \}' => '<?php else: ?>',
 			'\{ endif \}' => '<?php endif; ?>',
 
+			'\{ foreach ([^}]*) as ([A-Za-z0-9_]+) \}' => '<?php foreach($1 as $$2): ?>',
+			'\{ endforeach \}' => '<?php endforeach; ?>',
+
+			'\{ component ([^}]*) \}' => '<?php $_cp = new Component($1); $_cp -> render(); $this -> merge($_cp); ?>',
+			'\{ path ([^}]*) \}' => '<?php echo $this -> dir.$this -> path."/"."$1"; ?>',
+			'\{ function ([A-Za-z0-9_]+) \}' => '<?php echo $model -> $1(); ?>',
+
+			'\{ ([^}]*) \| ([^}]*) \}' => '<?php echo $this -> loadPipe($1, "$2"); ?>',
+			'\{ ([^}]*) \}' => '<?php echo $1; ?>',
+		];
+
+		private $specialTags = [
 			'\{% css %\}' => '<?php $this -> css(); ?>',
 			'\{% js %\}' => '<?php $this -> js(); ?>'
 		];
@@ -59,18 +55,16 @@
 				$this -> props = array_merge($this -> props, $model -> props);
 			} 
 
-			$content = $this -> prerender();
-			$content = $this -> replace_tags($content, $this -> specialTags);
-			ob_start();
-				eval("?> $content");
-				$content = ob_get_contents();
-			ob_end_clean();
-			echo $content;
+			$tpl = file_get_contents($this -> dir.$this -> path.$this -> dirName.'.tpl');
+
+			$content =  $this -> replace_tags($tpl, $this -> varTags);
+			$content = $this -> prerender($content, $this -> funcTags);
+			// echo $content; die();
+			echo $this -> prerender($content, $this -> specialTags);
 		}
 
-		private function prerender() {
-			$tpl = file_get_contents($this -> dir.$this -> path.$this -> dirName.'.tpl');
-			$content = $this -> replace_tags($tpl, $this -> tags);
+		private function prerender($tpl, $arr) {
+			$content = $this -> replace_tags($tpl, $arr);
 			ob_start();
 				eval("?> $content");
 				$content = ob_get_contents();
@@ -113,7 +107,7 @@
 
 		private function loadPipe($prop, $pipeStr) {
 			$result = '';
-			$pipes = explode(' | ', $pipeStr);
+			$pipes = explode(', ', $pipeStr);
 			foreach($pipes as $pipe) {
 				$pipeArgs = explode(':', $pipe);
 				$pipeName = array_shift($pipeArgs);
