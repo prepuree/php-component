@@ -1,6 +1,6 @@
 <?php
 	class Component {
-		private $dir = '';
+		private $dir = 'modules/';
 		private $pipesDir = 'pipes/';
 		private $path;
 		private $dirName;
@@ -11,7 +11,7 @@
 		private $varTags = [
 			'\$([A-Za-z0-9_]+)\.([^}]*)' => '$this -> props["$1"]["$2"]',
 			'\$([A-Za-z0-9_]+)' => '$this -> props["$1"]',
-			'\.([A-Za-z0-9_]+)' => '$$1',
+			'this\.([A-Za-z0-9_]+)' => '$$1',
 		];
 
 		private $funcTags = [
