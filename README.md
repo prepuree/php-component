@@ -51,17 +51,17 @@ You have to create **.tpl** file, the others is optional.
 ```
 
 ## TPL tags
-- **{ propName }** - displays setted variable value
-- **{ propArrayName.keyName }** - displays setted array variable value
-- **{ propName | pipeName1:arg1:arg2 | pipeName2 }** - returns value result from pipe's functions *(/pipes/pipeName.php)*
-- **{ if propName }** - if statement
-- **{ elseif propName }** - elseif statement
+- **{ $propName }** - displays setted variable value
+- **{ $propArrayName.keyName }** - displays setted array variable value
+- **{ $propName | pipeName1:arg1:arg2 | pipeName2 }** - returns value result from pipe's functions *(/pipes/pipeName.php)*
+- **{ if ... }** - if statement
+- **{ elseif ... }** - elseif statement
 - **{ else }** - else statement
 - **{ endif }** - ends if statement
-- **{ foreach propArrayName as varName }** - starts foreach loop and define variable
+- **{ foreach $propArrayName as varName }** - starts foreach loop and define variable
 - **{ .varName }** - displays variable value defined in foreach loop
 - **{ endforeach }** - ends foreach loop
-- **{ component propName }** or **{ component Namespace/To/Component }** - loads other component
+- **{ component $propName }** or **{ component Namespace/To/Component }** - loads other component
 - **{ path string }** - returns path of the component and adds '/string' suffix
 - **{ function funcName }** - displays returned value from model function
 - **{% css %}** - includes all css files from components
