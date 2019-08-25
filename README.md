@@ -53,7 +53,7 @@ You have to create **.tpl** file, the others is optional.
 ## TPL tags
 - **{ $propName }** - displays setted variable value
 - **{ $propArrayName.keyName }** - displays setted array variable value
-- **{ $propName | pipeName1:arg1:arg2 | pipeName2 }** - returns value result from pipe's functions *(/pipes/pipeName.php)*
+- **{ $propName | pipeName1:arg1:arg2, pipeName2 }** - returns value result from pipe's functions *(/pipes/pipeName.php)*
 - **{ if ... }** - if statement
 - **{ elseif ... }** - elseif statement
 - **{ else }** - else statement
