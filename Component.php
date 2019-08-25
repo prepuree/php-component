@@ -1,6 +1,6 @@
 <?php
 	class Component {
-		private $dir = 'modules/';
+		private $dir = '';
 		private $pipesDir = 'pipes/';
 		private $path;
 		private $dirName;
@@ -8,27 +8,34 @@
 		protected $css = [];
 		protected $js = [];
 		private $tags = [
-			'\{ foreach ([A-Za-z0-9_]+) as ([A-Za-z0-9_]+) \}' => '<?php foreach($this -> props["$1"] as $$2): ?>',
+			'\{ foreach \$([A-Za-z0-9_]+) as ([A-Za-z0-9_]+) \}' => '<?php foreach($this -> props["$1"] as $$2): ?>',
+			'\{ foreach \$([A-Za-z0-9_]+).([A-Za-z0-9_]+) as ([A-Za-z0-9_]+) \}' => '<?php foreach($this -> props["$1"]["$2"] as $$3): ?>',
 			'\{ endforeach \}' => '<?php endforeach; ?>',
-			'\{ if ([^}]*) \}' => '<?php if($this -> props["$1"]): ?>',
-			'\{ elseif ([^}]*) \}' => '<?php elseif($this -> props["$1"]): ?>',
-			'\{ else \}' => '<?php else: ?>',
-			'\{\ endif \}' => '<?php endif; ?>',
+
 			'\{ component ([A-Za-z0-9_]+) \}' => '<?php $_cp = new Component($this -> props["$1"]); $_cp -> render(); $this -> merge($_cp); ?>',
 			'\{ component ([^}]*) \}' => '<?php $_cp = new Component("$1"); $_cp -> render(); $this -> merge($_cp); ?>',
 			'\{ path ([^}]*) \}' => '<?php echo $this -> dir.$this -> path."/"."$1"; ?>',
 			'\{ function ([A-Za-z0-9_]+) \}' => '<?php echo $model -> $1(); ?>',
-			'\{ ([A-Za-z0-9_]+)\.([^}]*) \}' => '<?php echo $this -> props["$1"]["$2"]; ?>',
 
-			'\{ ([A-Za-z0-9_]+)\.([^}]*) \| ([^}]*) \}' => '<?php echo $this -> loadPipe($this -> props["$1"]["$2"], "$3"); ?>',
-			'\{ ([A-Za-z0-9_]+) \| ([^}]*) \}' => '<?php echo $this -> loadPipe($this -> props["$1"], "$2"); ?>',
+			'\{ \$([A-Za-z0-9_]+)\.([^}]*) \| ([^}]*) \}' => '<?php echo $this -> loadPipe($this -> props["$1"]["$2"], "$3"); ?>',
+			'\{ \$([A-Za-z0-9_]+) \| ([^}]*) \}' => '<?php echo $this -> loadPipe($this -> props["$1"], "$2"); ?>',
 			'\{ \.([A-Za-z0-9_]+) \| ([^}]*) \}' => '<?php echo $this -> loadPipe($$1, "$2"); ?>',
-
-			'\{ ([A-Za-z0-9_]+) \}' => '<?php echo $this -> props["$1"]; ?>',
+			
+			'\{ \$([A-Za-z0-9_]+)\.([^}]*) \}' => '<?php echo $this -> props["$1"]["$2"]; ?>',
+			'\{ \$([A-Za-z0-9_]+) \}' => '<?php echo $this -> props["$1"]; ?>',
 			'\{ \.([A-Za-z0-9_]+) \}' => '<?php echo $$1; ?>',
+
+			'\$([A-Za-z0-9_]+)\.([^}]*)' => '$this -> props["$1"]["$2"]',
+			'\$([A-Za-z0-9_]+)' => '$this -> props["$1"]',
+			'\.([A-Za-z0-9_]+)' => 'echo $$1',
 		];
 
 		private $specialTags = [
+			'\{ if ([^}]*) \}' => '<?php if($1): ?>',
+			'\{ elseif ([^}]*) \}' => '<?php elseif($1): ?>',
+			'\{ else \}' => '<?php else: ?>',
+			'\{ endif \}' => '<?php endif; ?>',
+			
 			'\{% css %\}' => '<?php $this -> css(); ?>',
 			'\{% js %\}' => '<?php $this -> js(); ?>'
 		];
@@ -54,7 +61,11 @@
 
 			$content = $this -> prerender();
 			$content = $this -> replace_tags($content, $this -> specialTags);
-			eval("?> $content");
+			ob_start();
+				eval("?> $content");
+				$content = ob_get_contents();
+			ob_end_clean();
+			echo $content;
 		}
 
 		private function prerender() {
